@@ -46,7 +46,7 @@ bot.on('chat', async (username, message) => {
         bot.chat('Ready!')
     }
 
-    if (message.startsWith('find')) {
+    if (message.startsWith('dig')) {
         if (!isLoaded) {
             await bot.waitForChunksToLoad()
             bot.chat('Ready!')
@@ -65,32 +65,33 @@ bot.on('chat', async (username, message) => {
         const time = (performance.now() - startTime).toFixed(2)
 
         bot.chat(`I found ${blocks.length} ${name} blocks in ${time} ms`)
-        if (blocks.length) {
-            let block = blocks[0]
-            await digTarget(block)
-            console.log(block)
+
+        for (const block of blocks) {
+            await digTarget(block);
         }
     }
 })
 
-async function digTarget(target) {
-
+async function digTarget(block) {
     if (bot.targetDigBlock) {
-        bot.chat(`already digging ${bot.targetDigBlock.name}`)
+        console.log(`already digging ${bot.targetDigBlock.name}`)
+        //bot.chat(`already digging ${bot.targetDigBlock.name}`)
     } else {
-        target = bot.blockAt(block)
+        let target = bot.blockAt(block)
         if (target && bot.canDigBlock(target)) {
-            bot.chat(`starting to dig ${target.name}`)
+            console.log(`starting to dig ${target.name}`)
+            //bot.chat(`starting to dig ${target.name}`)
             try {
+                //TODO:: нужно поворачивать голову к блоку который добывает
                 await bot.dig(target)
-                bot.chat(`finished digging ${target.name}`)
+                console.log(`finished digging ${target.name}`)
+                //bot.chat(`finished digging ${target.name}`)
             } catch (err) {
                 console.log(err.stack)
             }
         } else {
-            bot.chat('cannot dig')
+            console.log('cannot dig')
+            //bot.chat('cannot dig')
         }
     }
-
-    return Promise.resolve(1);
 }

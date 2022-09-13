@@ -68,8 +68,11 @@ bot.on('chat', async (username, message) => {
         const blocks = bot.findBlocks({ matching: ids, maxDistance: 128, count: 500 })
         const time = (performance.now() - startTime).toFixed(2)
 
+        const botPosition = bot.entity.position;
         bot.chat(`I found ${blocks.length} ${name} blocks in ${time} ms`)
-
+        // blocks.sort((a, b) => {
+        //     return a.distanceTo(botPosition) - b.distanceTo(botPosition);
+        // })
         for (const block of blocks) {
             await digTarget(block);
         }
@@ -78,7 +81,8 @@ bot.on('chat', async (username, message) => {
 
 async function digTarget(block) {
     bot.pathfinder.setMovements(new Movements(bot, mcData))
-    bot.pathfinder.setGoal(new goals.GoalNear(block.x, block.y + 1, block.z, 2))
+
+    await bot.pathfinder.goto(new goals.GoalNear(block.x, block.y + 1, block.z, 2))
 
     if (bot.targetDigBlock) {
         console.log(`already digging ${bot.targetDigBlock.name}`)

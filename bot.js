@@ -64,6 +64,11 @@ async function runTaskDigBlocks(message)
     }
 }
 
+/**
+ * TODO:: нужен поис по группе предметов
+ * @param name
+ * @returns {*}
+ */
 function findBlockIdByName(name) {
     if (!name || mcData.blocksByName[name] === undefined) {
         console.log(bot.entity.position)
@@ -74,11 +79,12 @@ function findBlockIdByName(name) {
 }
 
 async function digFirstBlockByIds(blockIds, name = 'empty') {
-
-    const blocks = findBlocksIdByIdInRange(blockIds, [2, 4, 8, 10, 20, 50, 100, 500, 1000])
-    const block = findFirstBlock(blocks);
-    if (block) {
+    let blocks = findBlocksIdByIdInRange(blockIds, [2, 4, 8, 10, 20, 50, 100, 500, 1000])
+    let block = findFirstBlock(blocks);
+    if (block !== undefined) {
         console.log(`I found ${blocks.length} ${name} blocks`)
+        //TODO:: нельзя копать под собой
+        await moveToDigTarget(block)
         await digTarget(block);
     }
 }
@@ -87,7 +93,7 @@ function findBlocksIdByIdInRange(blockIds, range = [128]) {
     for (let maxDistance of Enumerable.from(range)) {
         console.log(`find block ${blockIds} in range ${maxDistance}`);
         let blocks = bot.findBlocks({ matching: blockIds, maxDistance: maxDistance, count: 100 })
-        if (blocks.length) {
+        if (blocks.length > 0) {
             return blocks;
         }
     }
@@ -104,10 +110,21 @@ function findFirstBlock(blocks) {
     return blocks ? blocks.shift() : undefined;
 }
 
-async function digTarget(block) {
+async function moveToDigTarget(block) {
+    //TODO:: ставит блоки земли если не дотягивается
+    //TODO:: может не найти путь до места или упасть
+    //TODO:: уничтожает листву если мешает
     bot.pathfinder.setMovements(new Movements(bot, mcData))
     await bot.pathfinder.goto(new goals.GoalNear(block.x, block.y, block.z, 2))
+}
 
+/**
+ * TODO:: нужно менять инструмент перед добычей
+ * TODO:: инструмент нужно выбирать по группе
+ * @param block
+ * @returns {Promise<void>}
+ */
+async function digTarget(block) {
     if (bot.targetDigBlock) {
         console.log(`already digging ${bot.targetDigBlock.name}`)
         //bot.chat(`already digging ${bot.targetDigBlock.name}`)

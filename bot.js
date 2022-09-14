@@ -3,6 +3,7 @@ const { mineflayer: mineflayerViewer } = require('prismarine-viewer')
 const { pathfinder, Movements, goals } = require('mineflayer-pathfinder')
 const inventoryViewer = require('mineflayer-web-inventory')
 const {performance} = require("perf_hooks");
+const Enumerable = require('node-enumerable');
 
 const bot = mineflayer.createBot({
     host: '176.119.159.250', // optional
@@ -15,14 +16,12 @@ const bot = mineflayer.createBot({
 
 bot.loadPlugin(pathfinder)
 
-bot.on('chat', function (username, message) {
-    if (username === bot.username) return
-    bot.chat(message)
-})
 let mcData = null;
 // http://localhost:3007/
-bot.once('spawn', () => {
+bot.once('spawn', async () => {
     mcData = require('minecraft-data')(bot.version)
+
+    //await runTaskDigBlocks('dig grass_block');
     // mineflayerViewer(bot, { port: 3007, firstPerson: true }) // port is the minecraft server port, if first person is false, you get a bird's-eye view
 })
 
@@ -42,47 +41,72 @@ bot.on('chat', async (username, message) => {
 
     if (username === bot.username) return
 
-
-
-    if (message === 'loaded') {
-        console.log(bot.entity.position)
-        await bot.waitForChunksToLoad()
-        bot.chat('Ready!')
-    }
-
     if (message.startsWith('dig')) {
-        if (!isLoaded) {
-            await bot.waitForChunksToLoad()
-            bot.chat('Ready!')
-            isLoaded = true;
-        }
-
-        const name = message.split(' ')[1]
-        if (mcData.blocksByName[name] === undefined) {
-            console.log(bot.entity.position)
-            return
-        }
-        const ids = [mcData.blocksByName[name].id]
-
-        const startTime = performance.now()
-        const blocks = bot.findBlocks({ matching: ids, maxDistance: 128, count: 500 })
-        const time = (performance.now() - startTime).toFixed(2)
-
-        const botPosition = bot.entity.position;
-        bot.chat(`I found ${blocks.length} ${name} blocks in ${time} ms`)
-        // blocks.sort((a, b) => {
-        //     return a.distanceTo(botPosition) - b.distanceTo(botPosition);
-        // })
-        for (const block of blocks) {
-            await digTarget(block);
-        }
+       await runTaskDigBlocks(message);
     }
 })
 
+async function runTaskDigBlocks(message)
+{
+    if (!isLoaded) {
+        await bot.waitForChunksToLoad()
+        console.log('Ready!')
+        isLoaded = true;
+    }
+
+    const blockName = message.split(' ')[1]
+    const blockId = findBlockIdByName(blockName);
+    const blockIds = [blockId];
+    for (let number of Enumerable.range(0, 1000)) {
+        console.log(`run dig block number ${number}`);
+
+        await digFirstBlockByIds(blockIds, blockName);
+    }
+}
+
+function findBlockIdByName(name) {
+    if (!name || mcData.blocksByName[name] === undefined) {
+        console.log(bot.entity.position)
+        return
+    }
+
+    return mcData.blocksByName[name].id;
+}
+
+async function digFirstBlockByIds(blockIds, name = 'empty') {
+
+    const blocks = findBlocksIdByIdInRange(blockIds, [2, 4, 8, 10, 20, 50, 100, 500, 1000])
+    const block = findFirstBlock(blocks);
+    if (block) {
+        console.log(`I found ${blocks.length} ${name} blocks`)
+        await digTarget(block);
+    }
+}
+
+function findBlocksIdByIdInRange(blockIds, range = [128]) {
+    for (let maxDistance of Enumerable.from(range)) {
+        console.log(`find block ${blockIds} in range ${maxDistance}`);
+        let blocks = bot.findBlocks({ matching: blockIds, maxDistance: maxDistance, count: 100 })
+        if (blocks.length) {
+            return blocks;
+        }
+    }
+
+    return [];
+}
+
+function findFirstBlock(blocks) {
+    const botPosition = bot.entity.position;
+    blocks.sort((a, b) => {
+        return a.distanceTo(botPosition) - b.distanceTo(botPosition);
+    })
+
+    return blocks ? blocks.shift() : undefined;
+}
+
 async function digTarget(block) {
     bot.pathfinder.setMovements(new Movements(bot, mcData))
-
-    await bot.pathfinder.goto(new goals.GoalNear(block.x, block.y + 1, block.z, 2))
+    await bot.pathfinder.goto(new goals.GoalNear(block.x, block.y, block.z, 2))
 
     if (bot.targetDigBlock) {
         console.log(`already digging ${bot.targetDigBlock.name}`)

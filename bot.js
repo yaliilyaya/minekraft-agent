@@ -2,29 +2,28 @@ const mineflayer = require('mineflayer')
 const { mineflayer: mineflayerViewer } = require('prismarine-viewer')
 const { pathfinder, Movements, goals } = require('mineflayer-pathfinder')
 const inventoryViewer = require('mineflayer-web-inventory')
-const {performance} = require("perf_hooks");
-const Enumerable = require('node-enumerable');
+const { performance } = require('perf_hooks')
+const Enumerable = require('node-enumerable')
+const { AgentFinderBuilder } = require('./lib/mineflayer-agent-finder')
 
 const bot = mineflayer.createBot({
-    host: '176.119.159.250', // optional
-    port: 25565, // optional
-    username: 'agent-007', // E-mail и пароль используются для
-    // password: '12345678', // лицензионных серверов
-    version: '1.16.5', // При установленном значении false версия будет выбрана автоматически, используйте пример выше чтобы выбрать нужную версию
-    //auth: 'mojang' // Необязательное поле. По умолчанию используется mojang, если используется учетная запись microsoft, установите значение «microsoft»
+  host: '176.119.159.250', // optional
+  port: 25565, // optional
+  username: 'agent-007', // E-mail и пароль используются для
+  version: '1.16.5' // При установленном значении false версия будет выбрана автоматически, используйте пример выше чтобы выбрать нужную версию
 })
 
 bot.loadPlugin(pathfinder)
+const AgentFinder = AgentFinderBuilder(bot)
 
-let mcData = null;
+let mcData = null
 // http://localhost:3007/
 bot.once('spawn', async () => {
-    mcData = require('minecraft-data')(bot.version)
+  mcData = require('minecraft-data')(bot.version)
 
-    //await runTaskDigBlocks('dig grass_block');
-    // mineflayerViewer(bot, { port: 3007, firstPerson: true }) // port is the minecraft server port, if first person is false, you get a bird's-eye view
+  // await runTaskDigBlocks('dig grass_block');
+  // mineflayerViewer(bot, { port: 3007, firstPerson: true }) // port is the minecraft server port, if first person is false, you get a bird's-eye view
 })
-
 
 inventoryViewer(bot, {
 
@@ -34,34 +33,31 @@ inventoryViewer(bot, {
 bot.on('kicked', (reason, loggedIn) => console.log(reason, loggedIn))
 bot.on('error', err => console.log(err))
 
-
-let isLoaded = false;
+let isLoaded = false
 
 bot.on('chat', async (username, message) => {
+  if (username === bot.username) return
 
-    if (username === bot.username) return
-
-    if (message.startsWith('dig')) {
-       await runTaskDigBlocks(message);
-    }
+  if (message.startsWith('dig')) {
+    await runTaskDigBlocks(message)
+  }
 })
 
-async function runTaskDigBlocks(message)
-{
-    if (!isLoaded) {
-        await bot.waitForChunksToLoad()
-        console.log('Ready!')
-        isLoaded = true;
-    }
+async function runTaskDigBlocks (message) {
+  if (!isLoaded) {
+    await bot.waitForChunksToLoad()
+    console.log('Ready!')
+    isLoaded = true
+  }
 
-    const blockName = message.split(' ')[1]
-    const blockId = findBlockIdByName(blockName);
-    const blockIds = [blockId];
-    for (let number of Enumerable.range(0, 1000)) {
-        console.log(`run dig block number ${number}`);
+  const blockName = message.split(' ')[1]
+  const blockId = findBlockIdByName(blockName)
+  const blockIds = [blockId]
+  for (const number of Enumerable.range(0, 1)) {
+    console.log(`run dig block number ${number}`)
 
-        await digFirstBlockByIds(blockIds, blockName);
-    }
+    await digFirstBlockByIds(blockIds, blockName)
+  }
 }
 
 /**
@@ -69,53 +65,53 @@ async function runTaskDigBlocks(message)
  * @param name
  * @returns {*}
  */
-function findBlockIdByName(name) {
-    if (!name || mcData.blocksByName[name] === undefined) {
-        console.log(bot.entity.position)
-        return
-    }
+function findBlockIdByName (name) {
+  if (!name || mcData.blocksByName[name] === undefined) {
+    console.log(bot.entity.position)
+    return
+  }
 
-    return mcData.blocksByName[name].id;
+  return mcData.blocksByName[name].id
 }
 
-async function digFirstBlockByIds(blockIds, name = 'empty') {
-    let blocks = findBlocksIdByIdInRange(blockIds, [2, 4, 8, 10, 20, 50, 100, 500, 1000])
-    let block = findFirstBlock(blocks);
-    if (block !== undefined) {
-        console.log(`I found ${blocks.length} ${name} blocks`)
-        //TODO:: нельзя копать под собой
-        await moveToDigTarget(block)
-        await digTarget(block);
-    }
+async function digFirstBlockByIds (blockIds, name = 'empty') {
+  const blocks = AgentFinder.findBlocksIdByIdInRange(blockIds, [2, 4, 8, 10, 20, 50, 100, 500, 1000])
+  const block = AgentFinder.findFirstBlock(blocks)
+  if (block !== undefined) {
+    console.log(`I found ${blocks.length} ${name} blocks`)
+    // TODO:: нельзя копать под собой
+    await moveToDigTarget(block)
+    await digTarget(block)
+  }
 }
 
-function findBlocksIdByIdInRange(blockIds, range = [128]) {
-    for (let maxDistance of Enumerable.from(range)) {
-        console.log(`find block ${blockIds} in range ${maxDistance}`);
-        let blocks = bot.findBlocks({ matching: blockIds, maxDistance: maxDistance, count: 100 })
-        if (blocks.length > 0) {
-            return blocks;
-        }
-    }
+// function findBlocksIdByIdInRange (blockIds, range = [128]) {
+//   for (const maxDistance of Enumerable.from(range)) {
+//     console.log(`find block ${blockIds} in range ${maxDistance}`)
+//     const blocks = bot.findBlocks({ matching: blockIds, maxDistance, count: 100 })
+//     if (blocks.length > 0) {
+//       return blocks
+//     }
+//   }
+//
+//   return []
+// }
+//
+// function findFirstBlock (blocks) {
+//   const botPosition = bot.entity.position
+//   blocks.sort((a, b) => {
+//     return a.distanceTo(botPosition) - b.distanceTo(botPosition)
+//   })
+//
+//   return blocks ? blocks.shift() : undefined
+// }
 
-    return [];
-}
-
-function findFirstBlock(blocks) {
-    const botPosition = bot.entity.position;
-    blocks.sort((a, b) => {
-        return a.distanceTo(botPosition) - b.distanceTo(botPosition);
-    })
-
-    return blocks ? blocks.shift() : undefined;
-}
-
-async function moveToDigTarget(block) {
-    //TODO:: ставит блоки земли если не дотягивается
-    //TODO:: может не найти путь до места или упасть
-    //TODO:: уничтожает листву если мешает
-    bot.pathfinder.setMovements(new Movements(bot, mcData))
-    await bot.pathfinder.goto(new goals.GoalNear(block.x, block.y, block.z, 2))
+async function moveToDigTarget (block) {
+  // TODO:: ставит блоки земли если не дотягивается
+  // TODO:: может не найти путь до места или упасть
+  // TODO:: уничтожает листву если мешает
+  bot.pathfinder.setMovements(new Movements(bot, mcData))
+  await bot.pathfinder.goto(new goals.GoalNear(block.x, block.y, block.z, 2))
 }
 
 /**
@@ -124,26 +120,26 @@ async function moveToDigTarget(block) {
  * @param block
  * @returns {Promise<void>}
  */
-async function digTarget(block) {
-    if (bot.targetDigBlock) {
-        console.log(`already digging ${bot.targetDigBlock.name}`)
-        //bot.chat(`already digging ${bot.targetDigBlock.name}`)
+async function digTarget (block) {
+  if (bot.targetDigBlock) {
+    console.log(`already digging ${bot.targetDigBlock.name}`)
+    // bot.chat(`already digging ${bot.targetDigBlock.name}`)
+  } else {
+    const target = bot.blockAt(block)
+    if (target && bot.canDigBlock(target)) {
+      console.log(`starting to dig ${target.name}`)
+      // bot.chat(`starting to dig ${target.name}`)
+      try {
+        // TODO:: нужно поворачивать голову к блоку который добывает
+        await bot.dig(target)
+        console.log(`finished digging ${target.name}`)
+        // bot.chat(`finished digging ${target.name}`)
+      } catch (err) {
+        console.log(err.stack)
+      }
     } else {
-        let target = bot.blockAt(block)
-        if (target && bot.canDigBlock(target)) {
-            console.log(`starting to dig ${target.name}`)
-            //bot.chat(`starting to dig ${target.name}`)
-            try {
-                //TODO:: нужно поворачивать голову к блоку который добывает
-                await bot.dig(target)
-                console.log(`finished digging ${target.name}`)
-                //bot.chat(`finished digging ${target.name}`)
-            } catch (err) {
-                console.log(err.stack)
-            }
-        } else {
-            console.log(`cannot dig ${block} - ${bot.entity.position}`)
-            //bot.chat('cannot dig')
-        }
+      console.log(`cannot dig ${block} - ${bot.entity.position}`)
+      // bot.chat('cannot dig')
     }
+  }
 }

@@ -5,6 +5,7 @@ const inventoryViewer = require('mineflayer-web-inventory')
 const { performance } = require('perf_hooks')
 const Enumerable = require('node-enumerable')
 const { AgentFinderBuilder } = require('./lib/mineflayer-agent-finder')
+const { AgentDigBuilder } = require('./lib/mineflayer-agent-dig')
 
 const bot = mineflayer.createBot({
   host: '176.119.159.250', // optional
@@ -15,19 +16,20 @@ const bot = mineflayer.createBot({
 
 bot.loadPlugin(pathfinder)
 const AgentFinder = AgentFinderBuilder(bot)
+const AgentDig = AgentDigBuilder(bot, AgentFinder);
 
 let mcData = null
 // http://localhost:3007/
 bot.once('spawn', async () => {
   mcData = require('minecraft-data')(bot.version)
+  AgentFinder.mcData = mcData;
+  AgentDig.mcData = mcData;
 
-  // await runTaskDigBlocks('dig grass_block');
+  await runTaskDigBlocks('dig grass_block');
   // mineflayerViewer(bot, { port: 3007, firstPerson: true }) // port is the minecraft server port, if first person is false, you get a bird's-eye view
 })
 
-inventoryViewer(bot, {
-
-})
+inventoryViewer(bot, {})
 
 // Прослушивание ошибок и причин отключения от сервера:
 bot.on('kicked', (reason, loggedIn) => console.log(reason, loggedIn))
@@ -51,95 +53,13 @@ async function runTaskDigBlocks (message) {
   }
 
   const blockName = message.split(' ')[1]
-  const blockId = findBlockIdByName(blockName)
+  const blockId = AgentFinder.findBlockIdByName(blockName)
   const blockIds = [blockId]
   for (const number of Enumerable.range(0, 1)) {
     console.log(`run dig block number ${number}`)
 
-    await digFirstBlockByIds(blockIds, blockName)
+    await AgentDig.digFirstBlockByIds(blockIds, blockName)
   }
 }
 
-/**
- * TODO:: нужен поис по группе предметов
- * @param name
- * @returns {*}
- */
-function findBlockIdByName (name) {
-  if (!name || mcData.blocksByName[name] === undefined) {
-    console.log(bot.entity.position)
-    return
-  }
 
-  return mcData.blocksByName[name].id
-}
-
-async function digFirstBlockByIds (blockIds, name = 'empty') {
-  const blocks = AgentFinder.findBlocksIdByIdInRange(blockIds, [2, 4, 8, 10, 20, 50, 100, 500, 1000])
-  const block = AgentFinder.findFirstBlock(blocks)
-  if (block !== undefined) {
-    console.log(`I found ${blocks.length} ${name} blocks`)
-    // TODO:: нельзя копать под собой
-    await moveToDigTarget(block)
-    await digTarget(block)
-  }
-}
-
-// function findBlocksIdByIdInRange (blockIds, range = [128]) {
-//   for (const maxDistance of Enumerable.from(range)) {
-//     console.log(`find block ${blockIds} in range ${maxDistance}`)
-//     const blocks = bot.findBlocks({ matching: blockIds, maxDistance, count: 100 })
-//     if (blocks.length > 0) {
-//       return blocks
-//     }
-//   }
-//
-//   return []
-// }
-//
-// function findFirstBlock (blocks) {
-//   const botPosition = bot.entity.position
-//   blocks.sort((a, b) => {
-//     return a.distanceTo(botPosition) - b.distanceTo(botPosition)
-//   })
-//
-//   return blocks ? blocks.shift() : undefined
-// }
-
-async function moveToDigTarget (block) {
-  // TODO:: ставит блоки земли если не дотягивается
-  // TODO:: может не найти путь до места или упасть
-  // TODO:: уничтожает листву если мешает
-  bot.pathfinder.setMovements(new Movements(bot, mcData))
-  await bot.pathfinder.goto(new goals.GoalNear(block.x, block.y, block.z, 2))
-}
-
-/**
- * TODO:: нужно менять инструмент перед добычей
- * TODO:: инструмент нужно выбирать по группе
- * @param block
- * @returns {Promise<void>}
- */
-async function digTarget (block) {
-  if (bot.targetDigBlock) {
-    console.log(`already digging ${bot.targetDigBlock.name}`)
-    // bot.chat(`already digging ${bot.targetDigBlock.name}`)
-  } else {
-    const target = bot.blockAt(block)
-    if (target && bot.canDigBlock(target)) {
-      console.log(`starting to dig ${target.name}`)
-      // bot.chat(`starting to dig ${target.name}`)
-      try {
-        // TODO:: нужно поворачивать голову к блоку который добывает
-        await bot.dig(target)
-        console.log(`finished digging ${target.name}`)
-        // bot.chat(`finished digging ${target.name}`)
-      } catch (err) {
-        console.log(err.stack)
-      }
-    } else {
-      console.log(`cannot dig ${block} - ${bot.entity.position}`)
-      // bot.chat('cannot dig')
-    }
-  }
-}

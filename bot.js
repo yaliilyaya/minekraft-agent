@@ -1,9 +1,5 @@
-const mineflayer = require('mineflayer')
 const { mineflayer: mineflayerViewer } = require('prismarine-viewer')
-const { pathfinder, Movements, goals } = require('mineflayer-pathfinder')
 const inventoryViewer = require('mineflayer-web-inventory')
-const { performance } = require('perf_hooks')
-const Enumerable = require('node-enumerable')
 const { AgentBuilder } = require('./lib/mineflayer-agent')
 
 const Agent = AgentBuilder();

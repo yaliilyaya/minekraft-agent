@@ -3,10 +3,8 @@ const inventoryViewer = require('mineflayer-web-inventory')
 const { AgentBuilder } = require('./lib/mineflayer-agent')
 
 const Agent = AgentBuilder();
-Agent.config = {
-  host: '176.119.159.250',
-  username: 'agent-007',
-}
+Agent.config.host = '176.119.159.250';
+Agent.config.username = 'agent-007';
 
 const bot = Agent.connection();
 

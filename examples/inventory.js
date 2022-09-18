@@ -164,6 +164,10 @@ function itemToString (item) {
 
 function itemByName (name) {
   const items = bot.inventory.items()
-  if (require('minecraft-data')(bot.version).isNewerOrEqualTo('1.9') && bot.inventory.slots[45]) items.push(bot.inventory.slots[45])
+  // if (require('minecraft-data')(bot.version).isNewerOrEqualTo('1.9')
+  //     && bot.inventory.slots[45]
+  // ) {
+  //   items.push(bot.inventory.slots[45])
+  // }
   return items.filter(item => item.name === name)[0]
 }

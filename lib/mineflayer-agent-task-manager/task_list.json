@@ -31,6 +31,10 @@
       {
         "name": "log",
         "count": 1
+      },
+      {
+        "name": "dirt",
+        "count": 1
       }
     ]
   }

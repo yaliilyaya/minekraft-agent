@@ -5,11 +5,21 @@
       {
         "name": "wooden_shovel",
         "count": 3
-      },
+      }
+    ]
+  },
+  {
+    "type": "createTools",
+    "parts": [
       {
         "name": "wooden_pickaxe",
         "count": 3
-      },
+      }
+    ]
+  },
+  {
+    "type": "createTools",
+    "parts": [
       {
         "name": "wooden_axe",
         "count": 3
@@ -30,10 +40,6 @@
     "parts": [
       {
         "name": "log",
-        "count": 1
-      },
-      {
-        "name": "dirt",
         "count": 1
       }
     ]

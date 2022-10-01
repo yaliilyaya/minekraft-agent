@@ -1,0 +1,47 @@
+[
+  {
+    "type": "createTools",
+    "parts": [
+      {
+        "name": "wooden_shovel",
+        "count": 3
+      }
+    ]
+  },
+  {
+    "type": "createTools",
+    "parts": [
+      {
+        "name": "wooden_pickaxe",
+        "count": 3
+      }
+    ]
+  },
+  {
+    "type": "createTools",
+    "parts": [
+      {
+        "name": "wooden_axe",
+        "count": 3
+      }
+    ]
+  },
+  {
+    "type": "crateItem",
+    "parts": [
+      {
+        "name": "crafting_table",
+        "count": 1
+      }
+    ]
+  },
+  {
+    "type": "dig",
+    "parts": [
+      {
+        "name": "log",
+        "count": 1
+      }
+    ]
+  }
+]

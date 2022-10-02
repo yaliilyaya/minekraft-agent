@@ -1,10 +1,10 @@
 [
   {
-    "type": "dig",
+    "type": "crateItem",
     "parts": [
       {
-        "name": "log",
-        "count": 1
+        "name": "oak_planks",
+        "count": 10
       }
     ]
   }

@@ -36,6 +36,15 @@
     ]
   },
   {
+    "type": "crateItem",
+    "parts": [
+      {
+        "name": "oak_planks",
+        "count": 1
+      }
+    ]
+  },
+  {
     "type": "dig",
     "parts": [
       {

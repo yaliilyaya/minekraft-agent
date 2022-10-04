@@ -1,2 +1,11 @@
 [
+  {
+    "type": "crateItem",
+    "parts": [
+      {
+        "name": "wooden_axe",
+        "count": 1
+      }
+    ]
+  }
 ]

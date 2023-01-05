@@ -1,6 +1,6 @@
 [
   {
-    "type": "createTools",
+    "type": "crateItem",
     "parts": [
       {
         "name": "wooden_shovel",
@@ -9,7 +9,7 @@
     ]
   },
   {
-    "type": "createTools",
+    "type": "crateItem",
     "parts": [
       {
         "name": "wooden_pickaxe",
@@ -18,7 +18,7 @@
     ]
   },
   {
-    "type": "createTools",
+    "type": "crateItem",
     "parts": [
       {
         "name": "wooden_axe",

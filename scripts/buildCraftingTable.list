@@ -3,8 +3,8 @@ INFO:: mineflayer-agent-task-checker/Checker/BuildCraftingTableChecker.js
 INFO:: mineflayer-agent-task/index.js this.buildCraftingTable
 
 УСЛОВИЕ ПРОВАЛЕНО:: Предмет уже есть в инвенторе "crafting_table" "1"
-    ДЕЙСТВИЕ:: Создать задачу "Создание пердмета" "crafting_table" "1"
-    ДЕЙСТВИЕ:: Преостановить задачу
+УСЛОВИЕ::ДЕЙСТВИЕ:: Создать задачу "Создание пердмета" "crafting_table" "1"
+УСЛОВИЕ::ДЕЙСТВИЕ:: Преостановить задачу
 
 КОНСОЛЬ:: "Верстак есть в инвентаре, можно ставить его на землю"
 

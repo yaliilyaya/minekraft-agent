@@ -3,7 +3,34 @@
     "type": "crateItem",
     "parts": [
       {
-        "name": "crafting_table",
+        "name": "wooden_shovel",
+        "count": 3
+      }
+    ]
+  },
+  {
+    "type": "crateItem",
+    "parts": [
+      {
+        "name": "wooden_pickaxe",
+        "count": 3
+      }
+    ]
+  },
+  {
+    "type": "crateItem",
+    "parts": [
+      {
+        "name": "wooden_axe",
+        "count": 3
+      }
+    ]
+  },
+  {
+    "type": "crateItem",
+    "parts": [
+      {
+        "name": "wooden_axe",
         "count": 1
       }
     ]

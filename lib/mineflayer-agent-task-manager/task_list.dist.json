@@ -45,11 +45,29 @@
     ]
   },
   {
-    "type": "dig",
+    "type": "digItem",
     "parts": [
       {
         "name": "log",
         "count": 1
+      }
+    ]
+  },
+  {
+    "type": "digItem",
+    "parts": [
+      {
+        "name": "stone",
+        "count": 10
+      }
+    ]
+  },
+  {
+    "type": "digItem",
+    "parts": [
+      {
+        "name": "dirt",
+        "count": 10
       }
     ]
   }

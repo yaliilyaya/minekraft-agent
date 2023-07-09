@@ -34,26 +34,6 @@ function Agent (bot, mcData, AgentInventory, AgentTaskManager, AgentTask) {
     this.bot.pathfinder.setMovements(new Movements(this.bot, this.mcData))
     this.AgentTaskManager.load();
     await this.AgentTaskManager.run();
-
-    // setTimeout(async () => {
-      //TODO:: есть очень странная задержка перед загрузкой чанков
-
-      // await this.AgentTask.craftItem('wooden_axe', 1);
-      // await this.AgentTask.craftItem('oak_planks', 1);
-      //await this.AgentTask.runTaskDigBlocks('log', 1);
-      // await this.AgentTask.runTaskDigBlocks('dirt', 1);
-      // await this.AgentTask.runTaskDigBlocks('grass', 1);
-      // await this.AgentFinder.findCraftingTable()
-
-      //TODO:: НАписать отдельную задачу для тестовых сценариев
-      //INFO:: Предположим, что мы ищем место для постройки мнимого здания площадью 20x20 и высотой 7
-      // const buildArea = new BuildArea()
-      // buildArea.end = new vec3(1, 1, 1)
-      //
-      // const foundationPlace = await this.AgentFinder.findFoundationPlace(buildArea);
-      //
-      // console.log(foundationPlace.toString())
-    // }, 2000)
   }
 
   this.onChat = async (username, message) => {

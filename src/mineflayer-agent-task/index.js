@@ -1,8 +1,3 @@
-const Enumerable = require('node-enumerable')
-const {BuildArea} = require("../mineflayer-agent-finder/BuildArea");
-const vec3 = require("vec3");
-const {Vec3} = require("vec3");
-
 function AgentTask (JobContainer) {
   this.JobContainer = JobContainer
 

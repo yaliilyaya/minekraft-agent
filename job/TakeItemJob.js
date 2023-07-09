@@ -1,7 +1,6 @@
-function TakeItemChecker(AgentInventory, AgentItemInfo) {
+function TakeItemJob(AgentInventory, AgentItemInfo) {
     this.AgentInventory = AgentInventory;
     this.AgentItemInfo = AgentItemInfo;
-
 
     /**
      * для начала нужно проверить в инвентаре
@@ -22,6 +21,10 @@ function TakeItemChecker(AgentInventory, AgentItemInfo) {
         return this.AgentItemInfo.canDigItemByName(item.name)
             ? this.resultDigTask(item)
             : this.resultCreateTask(item)
+    }
+
+    this.run = async (task, callback) => {
+        callback({type: 'success'});
     }
 
     this.checkInventoryItemExist = (item) => this.AgentInventory.isItemExist(item.name, item.count)
@@ -75,5 +78,5 @@ function TakeItemChecker(AgentInventory, AgentItemInfo) {
 }
 
 module.exports = {
-    TakeItemChecker: TakeItemChecker
+    TakeItemJob: TakeItemJob
 }

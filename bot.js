@@ -1,12 +1,17 @@
 // const { mineflayer: mineflayerViewer } = require('prismarine-viewer')
 const inventoryViewer = require('mineflayer-web-inventory')
-const { AgentBuilder } = require('./lib/mineflayer-agent')
+const {ServiceContainer} = require("./lib/ServiceContainer");
 
-const Agent = AgentBuilder()
-Agent.config.host = '127.0.0.1'
-Agent.config.username = 'agent-007'
 
-const bot = Agent.connection()
+const serviceContainer = new ServiceContainer()
+serviceContainer.set('config.host', '127.0.0.1') // optional
+serviceContainer.set('config.port', '25565')// optional
+serviceContainer.set('config.username', 'agent-007') // E-mail и пароль используются для
+serviceContainer.set('config.version', '1.16.5') // При установленном значении false версия будет выбрана автоматически,
+                                                             // используйте пример выше чтобы выбрать нужную версию
+
+const agent  = serviceContainer.get('Agent')
+const bot = agent.connection()
 
 bot.once('spawn', async () => {
   console.log(bot.entity.position)

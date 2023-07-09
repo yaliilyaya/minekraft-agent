@@ -16,7 +16,4 @@ function AgentTaskChecker (JobContainer) {
 
 module.exports = {
   AgentTaskChecker: AgentTaskChecker,
-  AgentTaskCheckerBuilder: (JobContainer) => {
-    return new AgentTaskChecker(JobContainer)
-  }
 }
